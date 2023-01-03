@@ -1,25 +1,56 @@
 import { useEffect, useRef } from "react"
-import { createRoot } from "react-dom/client"
 import { useDispatch, useSelector } from "react-redux"
 import cytoscape from "cytoscape"
 import klay from "cytoscape-klay"
 import CytoscapeComponent from "react-cytoscapejs"
 import popper from "cytoscape-popper"
-import Tooltip from "../components/Tooltip"
 import { getHistory } from "../features/history/historySlice"
+import tippy from "tippy.js"
+import "tippy.js/dist/tippy.css"
 
 cytoscape.use(klay)
 cytoscape.use(popper)
 
 function Home() {
   const cyRef = useRef(null)
-  const cyPopperRef = useRef(null)
   const layout = { name: "klay" }
 
   const { history, isLoading, isError, message } = useSelector(
     (state) => state.history
   )
   const dispatch = useDispatch()
+
+  function makePopper(ele) {
+    let ref = ele.popperRef()
+    let dummyDomEle = document.createElement("div")
+
+    ele.tippy = tippy(dummyDomEle, {
+      // tippy options:
+      content: () => {
+        var div = document.createElement("div")
+        div.classList.add("tooltip-div")
+        var h3 = document.createElement("h3")
+        var ul = document.createElement("ul")
+
+        h3.innerHTML =
+          ele._private.data.id + ": " + ele._private.data.operation_type
+
+        for (const param in ele._private.data.custom_params) {
+          var li = document.createElement("li")
+          li.innerHTML = `${param}: ${ele._private.data.custom_params[param]}`
+          ul.appendChild(li)
+        }
+        div.appendChild(h3)
+        div.appendChild(ul)
+
+        return div
+      },
+      getReferenceClientRect: ref.getBoundingClientRect,
+      arrow: true,
+      allowHTML: true,
+      trigger: "manual", //when use program to handle
+    })
+  }
 
   useEffect(() => {
     const getElements = async () => {
@@ -29,36 +60,21 @@ function Home() {
       }
       const cy = cyRef.current
 
-      cy.nodes().on("mouseover", (event) => {
-        cyPopperRef.current = event.target.popper({
-          content: createContentFromComponent(<Tooltip data={event.target._private.data} />),
-          popper: {
-            placement: "top",
-            removeOnDestroy: true,
-          },
+      cy.elements()
+        .nodes()
+        .forEach(function (ele) {
+          makePopper(ele)
         })
-      })
 
-      cy.nodes().on("mouseout", () => {
-        if (cyPopperRef) {
-          cyPopperRef.current.destroy()
-        }
-      })
+      cy.elements().unbind("mouseover")
+      cy.elements().bind("mouseover", (event) => event.target.tippy.show())
+
+      cy.elements().unbind("mouseout")
+      cy.elements().bind("mouseout", (event) => event.target.tippy.hide())
     }
 
     getElements()
   }, [dispatch])
-
-  console.log(history)
-
-  const createContentFromComponent = (component) => {
-    const dummyDomEle = document.createElement("div")
-    const rootElement = dummyDomEle
-    const root = createRoot(rootElement)
-    root.render(component)
-    document.body.appendChild(dummyDomEle)
-    return dummyDomEle
-  }
 
   return (
     <>

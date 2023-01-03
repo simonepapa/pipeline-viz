@@ -9,8 +9,16 @@ const getHistory = async () => {
   return response.data
 }
 
+// Put history
+const putHistory = async (historyArray) => {
+  const response = await axios.post(API_URL, { historyArray: historyArray })
+
+  return response.data
+}
+
 const historyService = {
   getHistory,
+  putHistory,
 }
 
 export default historyService

@@ -28,6 +28,25 @@ export const getHistory = createAsyncThunk(
   }
 )
 
+// Put history
+export const putHistory = createAsyncThunk(
+  "history/putHistory",
+  async (historyArray, thunkAPI) => {
+    try {
+      return await historyService.putHistory(historyArray)
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const historySlice = createSlice({
   name: "history",
   initialState,
@@ -51,6 +70,18 @@ export const historySlice = createSlice({
         state.history = action.payload
       })
       .addCase(getHistory.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+      .addCase(putHistory.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(putHistory.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+      })
+      .addCase(putHistory.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
