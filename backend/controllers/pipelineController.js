@@ -1,12 +1,13 @@
 const asyncHandler = require("express-async-handler")
 
 const Pipeline = require("../models/pipelineModel")
+const Generation = require("../models/generationModel")
 
 // @desc    Get pipeline
 // @route   GET /api/pipeline
 // @access  Public
 const getPipeline = asyncHandler(async (req, res) => {
-  const pipeline = await Pipeline.findById("63b45abe73de332d62712eb3")
+  const pipeline = await Pipeline.findById(req.params.id)
   const pipelineJSON = pipeline.toObject()
   pipelineJSON.edges = []
   pipelineJSON.nodes.map((node, index) => {
@@ -32,8 +33,11 @@ const getPipeline = asyncHandler(async (req, res) => {
 // @route   POST /api/pipeline
 // @access  Public
 const putPipeline = asyncHandler(async (req, res) => {
-  const { pipelineArray } = req.body
-  for (const pipelineIndividual of pipelineArray) {
+  const { pipelines, caseId, generation } = req.body
+
+  const generationToUpdate = await Generation.findById(generation)
+
+  for (const pipeline of pipelines) {
     //pipelineIndividual.edges = []
     //pipelineIndividual.nodes.map((node, index) => {
     //  pipelineIndividual.nodes[index] = { data: node, grabbable: false }
@@ -52,13 +56,16 @@ const putPipeline = asyncHandler(async (req, res) => {
     //})
     //result = pipelineIndividual
 
-    pipeline = await Pipeline.create({
-      total_pipeline_operations: pipelineIndividual.total_pipeline_operations,
-      depth: pipelineIndividual.depth,
-      nodes: pipelineIndividual.nodes,
-      preprocessing: pipelineIndividual.preprocessing,
-      additional_info: pipelineIndividual.additional_info,
+    const newPipeline = await Pipeline.create({
+      "case.id": caseId,
+      "case.generation": generation,
+      total_pipeline_operations: pipeline.total_pipeline_operations,
+      depth: pipeline.depth,
+      nodes: pipeline.nodes,
+      preprocessing: pipeline.preprocessing,
+      additional_info: pipeline.additional_info,
     })
+    await Generation.findByIdAndUpdate(generation, { $push: { pipelines: newPipeline._id } })
   }
 
   res.status(200).json("Successful")

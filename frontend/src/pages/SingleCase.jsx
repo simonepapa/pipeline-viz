@@ -1,15 +1,75 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { toast } from "react-toastify"
 import Modal from "react-modal"
 import Sidebar from "../components/Sidebar"
 import { BsPlusCircle, BsXLg } from "react-icons/bs"
+import { putPipeline } from "../features/pipeline/pipelineSlice"
+import { getCase, resetInfo } from "../features/case/caseSlice"
+import { createGeneration } from "../features/generation/generationSlice"
 
 Modal.setAppElement("#root")
 
 function SingleCase() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
 
-  const onSubmit = (e) => {
+  const params = useParams()
+  const dispatch = useDispatch()
+  const { singleCase, isLoading, isError, message } = useSelector(
+    (state) => state.case
+  )
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message)
+    }
+
+    dispatch(resetInfo())
+  }, [isError, message])
+
+  console.log(singleCase)
+
+  useEffect(() => {
+    dispatch(getCase(params.id))
+  }, [dispatch])
+
+  const onSubmit = async (e) => {
     e.preventDefault()
+    dispatch(createGeneration({ caseId: params.id, number: 0 })).then(
+      async (event) => {
+        const results = []
+        await Promise.all(
+          [...e.target[0].files].map(
+            (file) =>
+              new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                  try {
+                    resolve(results.push(JSON.parse(reader.result)))
+                  } catch (err) {
+                    // Return a blank value; ignore non-JSON (or do whatever else)
+                    console.log("Please use .json!")
+                    resolve()
+                  }
+                }
+                reader.readAsText(file)
+              })
+          )
+        )
+
+        // Do Stuff
+        console.log(results)
+        const asd = await dispatch(
+          putPipeline({
+            pipelines: results,
+            caseId: params.id,
+            generation: event.payload._id,
+          })
+        )
+        console.log(asd)
+      }
+    )
   }
 
   const openModal = () => {
@@ -34,8 +94,14 @@ function SingleCase() {
         </div>
         <div>
           <form onSubmit={onSubmit} className="flex flex-col mt-2">
-            <p className="text-lg mb-1">Pipelines (upload all the .json files of a generation)</p>
-            <input type="file" className="file-input file-input-bordered w-full max-w-xs mt-2" multiple></input>
+            <p className="text-lg mb-1">
+              Pipelines (upload all the .json files of a generation)
+            </p>
+            <input
+              type="file"
+              className="file-input file-input-bordered w-full max-w-xs mt-2"
+              multiple
+            ></input>
             <div className="w-full flex justify-between mt-8">
               <button type="submit" className="btn">
                 Submit
@@ -48,7 +114,7 @@ function SingleCase() {
         </div>
       </Modal>
 
-      <Sidebar />
+      <Sidebar generations={singleCase && singleCase.generations} isLoading={isLoading} />
       <main>
         <div className="w-9/12 h-fit bg-base-100 mx-auto p-4 mt-2 ml-44 mr-4">
           <h1 className="text-2xl opacity-100">Case 1</h1>

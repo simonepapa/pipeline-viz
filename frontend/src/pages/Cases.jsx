@@ -18,7 +18,7 @@ function Cases() {
   })
 
   const dispatch = useDispatch()
-  const { cases, isLoading, isSuccess, isError, message } = useSelector(
+  const { cases, isLoading, isError, message } = useSelector(
     (state) => state.case
   )
 

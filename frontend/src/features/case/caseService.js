@@ -2,7 +2,7 @@ import axios from "axios"
 
 const API_URL = "/api/case/"
 
-// Get case
+// Get cases
 const getCases = async () => {
   const response = await axios.get(API_URL)
 
@@ -16,9 +16,17 @@ const createCase = async (name, description) => {
   return response.data
 }
 
+// Get case
+const getCase = async (caseId) => {
+  const response = await axios.get(API_URL + caseId)
+
+  return response.data
+}
+
 const historyService = {
   getCases,
   createCase,
+  getCase,
 }
 
 export default historyService

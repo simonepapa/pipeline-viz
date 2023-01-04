@@ -1,24 +1,24 @@
 import axios from "axios"
 
-const API_URL = "/api/history/"
+const API_URL = "/api/pipeline/"
 
 // Get history
-const getHistory = async () => {
-  const response = await axios.get(API_URL)
+const getPipeline = async (pipelineId) => {
+  const response = await axios.get(API_URL + pipelineId)
 
   return response.data
 }
 
 // Put history
-const putHistory = async (historyArray) => {
-  const response = await axios.post(API_URL, { historyArray: historyArray })
+const putPipeline = async (pipelines, caseId, generation) => {
+  const response = await axios.post(API_URL, { pipelines: pipelines, caseId: caseId, generation: generation })
 
   return response.data
 }
 
 const historyService = {
-  getHistory,
-  putHistory,
+  getPipeline,
+  putPipeline,
 }
 
 export default historyService

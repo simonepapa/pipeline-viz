@@ -1,41 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import pipelineService from "./pipelineService"
+import generationService from "./generationService"
 
 const initialState = {
-  pipeline: [],
+  generation: {},
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: "",
 }
 
-// Get pipeline
-export const getPipeline = createAsyncThunk(
-  "pipeline/getPipeline",
-  async (pipelineId, thunkAPI) => {
-    try {
-      return await pipelineService.getPipeline(pipelineId)
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString()
-
-      return thunkAPI.rejectWithValue(message)
-    }
-  }
-)
-
-// Put pipeline
-export const putPipeline = createAsyncThunk(
-  "pipeline/putPipeline",
+// Create generation
+export const createGeneration = createAsyncThunk(
+  "case/createGeneration",
   async (data, thunkAPI) => {
-    console.log(data)
-    const {pipelines, caseId, generation} = data
     try {
-      return await pipelineService.putPipeline(pipelines, caseId, generation)
+      const { caseId, number } = data
+      return await generationService.createGeneration(caseId, number)
     } catch (error) {
       const message =
         (error.response &&
@@ -49,8 +29,27 @@ export const putPipeline = createAsyncThunk(
   }
 )
 
-export const pipelineSlice = createSlice({
-  name: "pipeline",
+// Get generation
+export const getGeneration = createAsyncThunk(
+  "case/getGeneration",
+  async (generationId, thunkAPI) => {
+    try {
+      return await generationService.getGeneration(generationId)
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+export const generationSlice = createSlice({
+  name: "generation",
   initialState,
   reducers: {
     resetAll: (state) => initialState,
@@ -63,27 +62,27 @@ export const pipelineSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getPipeline.pending, (state) => {
+      .addCase(createGeneration.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(getPipeline.fulfilled, (state, action) => {
+      .addCase(createGeneration.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
-        state.pipeline = action.payload
       })
-      .addCase(getPipeline.rejected, (state, action) => {
+      .addCase(createGeneration.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
       })
-      .addCase(putPipeline.pending, (state) => {
+      .addCase(getGeneration.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(putPipeline.fulfilled, (state, action) => {
+      .addCase(getGeneration.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
+        state.generation = action.payload
       })
-      .addCase(putPipeline.rejected, (state, action) => {
+      .addCase(getGeneration.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
@@ -91,5 +90,5 @@ export const pipelineSlice = createSlice({
   },
 })
 
-export const { resetAll, resetInfo } = pipelineSlice.actions
-export default pipelineSlice.reducer
+export const { resetAll, resetInfo } = generationSlice.actions
+export default generationSlice.reducer

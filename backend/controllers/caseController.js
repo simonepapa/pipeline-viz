@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler")
 
 const Case = require("../models/caseModel")
 
-// @desc    Create case
+// @desc    Get cases
 // @route   GET /api/case
 // @access  Public
 const getCases = asyncHandler(async (req, res) => {
@@ -25,7 +25,17 @@ const createCase = asyncHandler(async (req, res) => {
   res.status(200).json(newCase)
 })
 
+// @desc    Get generations
+// @route   GET /api/case/:id
+// @access  Public
+const getCase = asyncHandler(async (req, res) => {
+  const singleCase = await Case.findById(req.params.id)
+
+  res.status(200).json(singleCase)
+})
+
 module.exports = {
   getCases,
   createCase,
+  getCase
 }

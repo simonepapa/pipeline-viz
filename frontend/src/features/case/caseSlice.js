@@ -3,7 +3,7 @@ import caseService from "./caseService"
 
 const initialState = {
   cases: [],
-  case: {},
+  singleCase: {},
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -36,6 +36,25 @@ export const createCase = createAsyncThunk(
     try {
       const {name, description} = caseData
       return await caseService.createCase(name, description)
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+// Get case
+export const getCase = createAsyncThunk(
+  "case/getCase",
+  async (caseId, thunkAPI) => {
+    try {
+      return await caseService.getCase(caseId)
     } catch (error) {
       const message =
         (error.response &&
@@ -85,6 +104,19 @@ export const pipelineSlice = createSlice({
         state.cases.push(action.payload)
       })
       .addCase(createCase.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+      .addCase(getCase.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getCase.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.singleCase = action.payload
+      })
+      .addCase(getCase.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
