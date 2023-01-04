@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const historyModel = mongoose.Schema(
+const pipelineModel = mongoose.Schema(
   {
     total_pipeline_operations: {
       type: Array,
@@ -23,4 +23,4 @@ const historyModel = mongoose.Schema(
   }
 )
 
-module.exports = mongoose.model("History", historyModel)
+module.exports = mongoose.model("Pipeline", pipelineModel)

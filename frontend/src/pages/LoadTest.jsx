@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux"
-import { putHistory } from "../features/history/historySlice"
+import { putPipeline } from "../features/pipeline/pipelineSlice"
 
 function LoadTest() {
   const dispatch = useDispatch()
@@ -28,7 +28,7 @@ function LoadTest() {
 
     // Do Stuff
     console.log(results)
-    const asd = await dispatch(putHistory(results))
+    const asd = await dispatch(putPipeline(results))
     console.log(asd)
   }
 

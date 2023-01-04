@@ -4,7 +4,7 @@ import cytoscape from "cytoscape"
 import klay from "cytoscape-klay"
 import CytoscapeComponent from "react-cytoscapejs"
 import popper from "cytoscape-popper"
-import { getHistory } from "../features/history/historySlice"
+import { getPipeline } from "../features/pipeline/pipelineSlice"
 import tippy from "tippy.js"
 import "tippy.js/dist/tippy.css"
 
@@ -15,8 +15,8 @@ function Home() {
   const cyRef = useRef(null)
   const layout = { name: "klay" }
 
-  const { history, isLoading, isError, message } = useSelector(
-    (state) => state.history
+  const { pipeline, isLoading, isError, message } = useSelector(
+    (state) => state.pipeline
   )
   const dispatch = useDispatch()
 
@@ -54,9 +54,9 @@ function Home() {
 
   useEffect(() => {
     const getElements = async () => {
-      await dispatch(getHistory())
-      for (const property in history) {
-        console.log(`${property}: ${history[property]}`)
+      await dispatch(getPipeline())
+      for (const property in pipeline) {
+        console.log(`${property}: ${pipeline[property]}`)
       }
       const cy = cyRef.current
 
@@ -83,7 +83,7 @@ function Home() {
           cy={(cy) => {
             cyRef.current = cy
           }}
-          elements={CytoscapeComponent.normalizeElements(history)}
+          elements={CytoscapeComponent.normalizeElements(pipeline)}
           userZoomingEnabled={true}
           minZoom={3}
           maxZoom={3}

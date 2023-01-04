@@ -1,8 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import historyReducer from '../features/history/historySlice';
+import { configureStore } from "@reduxjs/toolkit"
+import pipelineReducer from "../features/pipeline/pipelineSlice"
+import caseReducer from "../features/case/caseSlice"
 
 export const store = configureStore({
   reducer: {
-    history: historyReducer,
+    case: caseReducer,
+    pipeline: pipelineReducer,
   },
-});
+})

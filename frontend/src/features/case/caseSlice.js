@@ -1,20 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import historyService from "./historyService"
+import caseService from "./caseService"
 
 const initialState = {
-  history: [],
+  cases: [],
+  case: {},
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: "",
 }
 
-// Get history
-export const getHistory = createAsyncThunk(
-  "history/getHistory",
-  async (_, thunkAPI) => {
+// Get cases
+export const getCases = createAsyncThunk(
+  "case/getCases",
+  async (name, thunkAPI) => {
     try {
-      return await historyService.getHistory()
+      return await caseService.getCases(name)
     } catch (error) {
       const message =
         (error.response &&
@@ -28,12 +29,13 @@ export const getHistory = createAsyncThunk(
   }
 )
 
-// Put history
-export const putHistory = createAsyncThunk(
-  "history/putHistory",
-  async (historyArray, thunkAPI) => {
+// Create case
+export const createCase = createAsyncThunk(
+  "case/createCase",
+  async (caseData, thunkAPI) => {
     try {
-      return await historyService.putHistory(historyArray)
+      const {name, description} = caseData
+      return await caseService.createCase(name, description)
     } catch (error) {
       const message =
         (error.response &&
@@ -47,8 +49,8 @@ export const putHistory = createAsyncThunk(
   }
 )
 
-export const historySlice = createSlice({
-  name: "history",
+export const pipelineSlice = createSlice({
+  name: "case",
   initialState,
   reducers: {
     resetAll: (state) => initialState,
@@ -61,27 +63,28 @@ export const historySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getHistory.pending, (state) => {
+      .addCase(getCases.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(getHistory.fulfilled, (state, action) => {
+      .addCase(getCases.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
-        state.history = action.payload
+        state.cases = action.payload
       })
-      .addCase(getHistory.rejected, (state, action) => {
+      .addCase(getCases.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
       })
-      .addCase(putHistory.pending, (state) => {
+      .addCase(createCase.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(putHistory.fulfilled, (state, action) => {
+      .addCase(createCase.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
+        state.cases.push(action.payload)
       })
-      .addCase(putHistory.rejected, (state, action) => {
+      .addCase(createCase.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload
@@ -89,5 +92,5 @@ export const historySlice = createSlice({
   },
 })
 
-export const { resetAll, resetInfo } = historySlice.actions
-export default historySlice.reducer
+export const { resetAll, resetInfo } = pipelineSlice.actions
+export default pipelineSlice.reducer

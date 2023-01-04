@@ -9,68 +9,81 @@ body {
 }
 
 /** SPINNER */
-.spinner-container {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.loader {
+  transform: rotateZ(45deg);
+  perspective: 1000px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: hsl(var(--p));
 }
-.spinner-container-inline {
-  position: static;
-  background-color: transparent;
-}
-.lds-ring {
-  display: inline-block;
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  top: 50%;
-}
-.lds-ring div {
-  box-sizing: border-box;
+.loader:before,
+.loader:after {
+  content: "";
   display: block;
   position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border: 8px solid #fff;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
   border-radius: 50%;
-  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #fff transparent transparent transparent;
+  transform: rotateX(70deg);
+  animation: 1s spin linear infinite;
 }
-.lds-ring div:nth-child(1) {
-  animation-delay: -0.45s;
+.loader:after {
+  color: hsl(var(--a));
+  transform: rotateY(70deg);
+  animation-delay: 0.4s;
 }
-.lds-ring div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.lds-ring div:nth-child(3) {
-  animation-delay: -0.15s;
-}
-.spinner-container-inline .lds-ring {
-  position: static;
-  transform: scale(0.5);
-}
-@keyframes lds-ring {
+
+@keyframes rotate {
   0% {
-    transform: rotate(0deg);
+    transform: translate(-50%, -50%) rotateZ(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotateZ(360deg);
+  }
+}
+
+@keyframes rotateccw {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@keyframes spin {
+  0%,
+  100% {
+    box-shadow: 0.2em 0px 0 0px currentcolor;
+  }
+  12% {
+    box-shadow: 0.2em 0.2em 0 0 currentcolor;
+  }
+  25% {
+    box-shadow: 0 0.2em 0 0px currentcolor;
+  }
+  37% {
+    box-shadow: -0.2em 0.2em 0 0 currentcolor;
+  }
+  50% {
+    box-shadow: -0.2em 0 0 0 currentcolor;
+  }
+  62% {
+    box-shadow: -0.2em -0.2em 0 0 currentcolor;
+  }
+  75% {
+    box-shadow: 0px -0.2em 0 0 currentcolor;
+  }
+  87% {
+    box-shadow: 0.2em -0.2em 0 0 currentcolor;
   }
 }
 
 body {
-  font-family: helvetica neue, helvetica, liberation sans, arial,
-    sans-serif;
+  font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
   font-size: 14px;
 }
 
@@ -98,4 +111,9 @@ h1 {
 }
 .tooltip-div ul {
   text-align: left;
+}
+
+.generation-active {
+  font-weight: 700;
+  background-color: hsl(var(--p));
 }
