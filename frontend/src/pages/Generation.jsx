@@ -30,7 +30,7 @@ function Generation() {
 
   useEffect(() => {
     dispatch(getGeneration(params.generation))
-  }, [dispatch])
+  }, [dispatch, params.generation])
 
   return (
     <>

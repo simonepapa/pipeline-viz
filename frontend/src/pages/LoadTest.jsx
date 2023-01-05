@@ -27,7 +27,6 @@ function LoadTest() {
     )
 
     // Do Stuff
-    console.log(results)
     await dispatch(putPipeline({
       pipelines: results,
       caseId: '63b59913922bd4d0b422d97f',

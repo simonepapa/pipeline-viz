@@ -3,6 +3,7 @@ const router = express.Router()
 const {
   createGeneration,
   getGeneration,
+  getGenerations,
 } = require("../controllers/generationController.js")
 
 router.route("/").post(createGeneration)

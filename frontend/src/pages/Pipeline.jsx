@@ -107,10 +107,7 @@ function Generation() {
 
   return (
     <>
-      <Sidebar
-        generations={singleCase && singleCase.generations}
-        isLoading={isLoading}
-      />
+      <Sidebar />
       <main className="flex flex-wrap">
         <div className="w-fit max-w-5xl h-fit bg-base-100 ml-44 p-4 mt-4">
           <h1 className="text-xl text-current opacity-100 font-bold uppercase mb-2">
@@ -121,7 +118,7 @@ function Generation() {
             only to identify each pipeline
           </p>
           <div className="flex flex-wrap mt-4">
-            {(!isLoadingPipeline && pipeline) ? (
+            {!isLoadingPipeline && pipeline ? (
               <CytoscapeComponent
                 cy={(cy) => {
                   cyRef.current = cy

@@ -14,7 +14,9 @@ const createGeneration = asyncHandler(async (req, res) => {
     number: number,
   })
 
-  await Case.findByIdAndUpdate(caseId, { $push: { generations: generation._id } })
+  await Case.findByIdAndUpdate(caseId, {
+    $push: { generations: generation._id },
+  })
 
   res.status(200).json(generation)
 })
@@ -30,5 +32,5 @@ const getGeneration = asyncHandler(async (req, res) => {
 
 module.exports = {
   createGeneration,
-  getGeneration
+  getGeneration,
 }

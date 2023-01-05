@@ -56,9 +56,6 @@ function Home() {
   useEffect(() => {
     const getElements = async () => {
       await dispatch(getPipeline())
-      for (const property in pipeline) {
-        console.log(`${property}: ${pipeline[property]}`)
-      }
       const cy = cyRef.current
 
       cy.elements()
