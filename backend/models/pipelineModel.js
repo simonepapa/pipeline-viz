@@ -12,21 +12,27 @@ const pipelineModel = mongoose.Schema(
         ref: "Generation",
       }
     },
-    total_pipeline_operations: {
-      type: Array,
+    fitness: {
+      type: Object
     },
-    depth: {
-      type: Number,
+    graph: {
+      type: Object
     },
-    nodes: {
-      type: Array,
+    metadata: {
+      type: Object
     },
-    preprocessing: {
-      type: Array,
+    native_generation: {
+      type: Number
     },
-    additional_info: {
-      type: Array,
+    parent_operator: {
+      type: Object
     },
+    uid: {
+      type: String
+    },
+    _class_path: {
+      type: String
+    }
   },
   {
     timestamps: true,

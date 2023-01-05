@@ -32,7 +32,6 @@ export const getPipeline = createAsyncThunk(
 export const putPipeline = createAsyncThunk(
   "pipeline/putPipeline",
   async (data, thunkAPI) => {
-    console.log(data)
     const {pipelines, caseId, generation} = data
     try {
       return await pipelineService.putPipeline(pipelines, caseId, generation)

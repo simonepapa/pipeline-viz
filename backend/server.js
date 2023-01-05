@@ -1,4 +1,5 @@
 const express = require("express")
+var bodyParser = require("body-parser")
 const dotenv = require("dotenv").config()
 const { errorHandler } = require("./middleware/errorMiddleware")
 const connectDB = require("./config/db")
@@ -9,8 +10,10 @@ connectDB()
 
 const app = express()
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json({ length: 52428800, limit: "50mb" }))
+app.use(
+  express.urlencoded({ length: 52428800, limit: "50mb", extended: false })
+)
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Pipeline Viz APP" })

@@ -28,8 +28,11 @@ function LoadTest() {
 
     // Do Stuff
     console.log(results)
-    const asd = await dispatch(putPipeline(results))
-    console.log(asd)
+    await dispatch(putPipeline({
+      pipelines: results,
+      caseId: '63b59913922bd4d0b422d97f',
+      generation: '63b6e5c62e7e29aec43c9ff6',
+    }))
   }
 
   return (

@@ -35,6 +35,14 @@ body {
   transform: rotateY(70deg);
   animation-delay: 0.4s;
 }
+.loader-full {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+  top: 0;
+}
+
 
 @keyframes rotate {
   0% {

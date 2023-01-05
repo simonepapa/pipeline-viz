@@ -5,6 +5,7 @@ const {
   putPipeline
 } = require("../controllers/pipelineController.js")
 
-router.route("/").get(getPipeline).post(putPipeline)
+router.route("/").post(putPipeline)
+router.route("/:id").get(getPipeline)
 
 module.exports = router

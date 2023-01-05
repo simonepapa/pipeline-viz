@@ -32,8 +32,6 @@ function Generation() {
     dispatch(getGeneration(params.generation))
   }, [dispatch])
 
-  console.log(generation)
-
   return (
     <>
       <Sidebar
@@ -49,8 +47,8 @@ function Generation() {
           <div className="flex flex-wrap mt-4">
             {(!isLoadingGeneration && Object.keys(generation).length !== 0) ? (
               generation.pipelines.map((pipeline, index) => (
-                <NavLink key={pipeline}>
-                  <div className="px-8 py-4 mr-8 bg-secondary rounded hover:bg-secondary-focus transition-colors">
+                <NavLink key={pipeline} to={`${pipeline}`}>
+                  <div className="px-8 py-4 mr-8 mb-4 bg-secondary rounded hover:bg-secondary-focus transition-colors">
                     <p className="text-lg font-bold">{index}</p>
                   </div>
                 </NavLink>

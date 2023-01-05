@@ -18,7 +18,7 @@ function Sidebar({ generations, isLoading }) {
                 : "text-normal my-2 bg-base-300 hover:bg-primary transition-colors py-2 px-4 rounded"
             }
           >
-            {index + 1}
+            {index}
           </NavLink>
         ))
       ) : (

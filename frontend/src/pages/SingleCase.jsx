@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { NavLink, useParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import Modal from "react-modal"
 import Sidebar from "../components/Sidebar"
+import SpinnerFull from "../components/SpinnerFull"
 import { BsPlusCircle, BsXLg } from "react-icons/bs"
 import { putPipeline } from "../features/pipeline/pipelineSlice"
 import { getCase, resetInfo } from "../features/case/caseSlice"
@@ -19,6 +20,9 @@ function SingleCase() {
   const { singleCase, isLoading, isError, message } = useSelector(
     (state) => state.case
   )
+  const { isLoading: isLoadingPipeline } = useSelector(
+    (state) => state.pipeline
+  )
 
   useEffect(() => {
     if (isError) {
@@ -28,54 +32,54 @@ function SingleCase() {
     dispatch(resetInfo())
   }, [isError, message])
 
-  console.log(singleCase)
-
   useEffect(() => {
     dispatch(getCase(params.id))
   }, [dispatch])
 
   const onSubmit = async (e) => {
     e.preventDefault()
-    dispatch(createGeneration({ caseId: params.id, number: 0 })).then(
-      async (event) => {
-        const results = []
-        await Promise.all(
-          [...e.target[0].files].map(
-            (file) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader()
-                reader.onloadend = () => {
-                  try {
-                    resolve(results.push(JSON.parse(reader.result)))
-                  } catch (err) {
-                    // Return a blank value; ignore non-JSON (or do whatever else)
-                    console.log("Please use .json!")
-                    resolve()
-                  }
+    dispatch(
+      createGeneration({ caseId: params.id, number: singleCase.generations.length })
+    ).then(async (event) => {
+      const results = []
+      await Promise.all(
+        [...e.target[0].files].map(
+          (file) =>
+            new Promise((resolve, reject) => {
+              const reader = new FileReader()
+              reader.onloadend = () => {
+                try {
+                  resolve(results.push(JSON.parse(reader.result)))
+                } catch (err) {
+                  // Return a blank value; ignore non-JSON (or do whatever else)
+                  console.log("Please use .json!")
+                  resolve()
                 }
-                reader.readAsText(file)
-              })
-          )
+              }
+              reader.readAsText(file)
+            })
         )
+      )
 
-        // Do Stuff
-        console.log(results)
-        const asd = await dispatch(
-          putPipeline({
-            pipelines: results,
-            caseId: params.id,
-            generation: event.payload._id,
-          })
-        )
-        console.log(asd)
-      }
-    )
+      // Do Stuff
+      await dispatch(
+        putPipeline({
+          pipelines: results,
+          caseId: params.id,
+          generation: event.payload._id,
+        })
+      )
+    })
   }
 
   const openModal = () => {
     setModalIsOpen(true)
   }
   const closeModal = () => setModalIsOpen(false)
+
+  if (isLoadingPipeline) {
+    return <SpinnerFull />
+  }
 
   return (
     <>
@@ -114,11 +118,17 @@ function SingleCase() {
         </div>
       </Modal>
 
-      <Sidebar generations={singleCase && singleCase.generations} isLoading={isLoading} />
+      <Sidebar
+        generations={singleCase && singleCase.generations}
+        isLoading={isLoading}
+      />
       <main>
         <div className="w-9/12 h-fit bg-base-100 mx-auto p-4 mt-2 ml-44 mr-4">
           <h1 className="text-2xl opacity-100">Case 1</h1>
           <p className="text-lg mt-1">Case description</p>
+          <NavLink to="history" className="btn btn-primary mr-4">
+            History
+          </NavLink>
           <button onClick={openModal} className="btn btn-primary gap-2 mt-4">
             <BsPlusCircle className="w-6 h-6 mr-2" />
             Create new generation

@@ -33,11 +33,12 @@ function Home() {
         var ul = document.createElement("ul")
 
         h3.innerHTML =
-          ele._private.data.id + ": " + ele._private.data.operation_type
+          //ele._private.data.id + ": " + ele._private.data.operation_type
+          ele._private.data.name
 
-        for (const param in ele._private.data.custom_params) {
+        for (const param in ele._private.data.params) {
           var li = document.createElement("li")
-          li.innerHTML = `${param}: ${ele._private.data.custom_params[param]}`
+          li.innerHTML = `${param}: ${ele._private.data.params[param]}`
           ul.appendChild(li)
         }
         div.appendChild(h3)
@@ -91,7 +92,7 @@ function Home() {
             {
               selector: "node",
               style: {
-                content: "data(operation_type)",
+                content: "data(name)",
                 "text-valign": "center",
                 "font-size": "8px",
                 width: "50px",

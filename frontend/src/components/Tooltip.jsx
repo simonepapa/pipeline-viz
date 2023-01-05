@@ -14,8 +14,7 @@ function Tooltip({ data }) {
     }
     return elements
   }
-  console.log(data)
-
+  
   return (
     <Tippy
       content={
