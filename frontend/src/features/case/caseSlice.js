@@ -5,6 +5,7 @@ const initialState = {
   cases: [],
   singleCase: {},
   generations: [],
+  pipelines: [],
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -89,6 +90,26 @@ export const getGenerations = createAsyncThunk(
   }
 )
 
+// Get generation cases
+export const getGenerationCases = createAsyncThunk(
+  "case/getGenerationCases",
+  async (data, thunkAPI) => {
+    try {
+      const {caseId, ids} = data
+      return await caseService.getGenerationCases(caseId, ids)
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const pipelineSlice = createSlice({
   name: "case",
   initialState,
@@ -151,6 +172,19 @@ export const pipelineSlice = createSlice({
         state.generations = action.payload
       })
       .addCase(getGenerations.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+      .addCase(getGenerationCases.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getGenerationCases.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.pipelines = action.payload
+      })
+      .addCase(getGenerationCases.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload

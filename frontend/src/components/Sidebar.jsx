@@ -23,14 +23,15 @@ function Sidebar() {
 
   return (
     <div className="fixed w-40 h-screen flex flex-col items-center bg-base-100 left-0 overflow-y-auto pb-4">
-      <NavLink to={`/cases/${params.id}/history`}>
+      <NavLink to={`/cases/${params.id}/history`} className="text-lg font-bold mt-2">
         History
       </NavLink>
-      <h2 className="text-lg font-bold mt-2">Generations</h2>
+      <h2 className="text-normal mt-2">Generations</h2>
       {!isLoading ? (
         singleCase.generations &&
         singleCase.generations.map((generation, index) => (
           <NavLink
+            key={index}
             to={`/cases/${params.id}/${generation}`}
             className={({ isActive }) =>
               isActive

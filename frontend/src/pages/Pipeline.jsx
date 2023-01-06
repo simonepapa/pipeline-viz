@@ -110,13 +110,9 @@ function Generation() {
       <Sidebar />
       <main className="flex flex-wrap">
         <div className="w-fit max-w-5xl h-fit bg-base-100 ml-44 p-4 mt-4">
-          <h1 className="text-xl text-current opacity-100 font-bold uppercase mb-2">
-            Generation
+          <h1 className="text-xl text-current opacity-100 font-bold">
+            PIPELINE {pipeline.uid}
           </h1>
-          <p>
-            Please note that the pipelines are not in order. The number is shown
-            only to identify each pipeline
-          </p>
           <div className="flex flex-wrap mt-4">
             {!isLoadingPipeline && pipeline ? (
               <CytoscapeComponent

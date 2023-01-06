@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler")
 
 const Case = require("../models/caseModel")
 const Generation = require("../models/generationModel")
+const Pipeline = require("../models/pipelineModel")
 
 // @desc    Get cases
 // @route   GET /api/case
@@ -49,9 +50,35 @@ const getGenerations = asyncHandler(async (req, res) => {
   res.status(200).json(generations)
 })
 
+// @desc    Get generation cases
+// @route   GET /api/:id/:generation/cases
+// @access  Public
+const getGenerationCases = asyncHandler(async (req, res) => {
+  const { ids } = req.body
+  const pipelines = []
+
+  for (let i = 0; i < ids.length; i++) {
+    const temp = await Pipeline.find({
+      "case.id": req.params.id,
+      _id: { $in: ids[i] },
+    })
+    pipelines.push(temp)
+  }
+  /*const pipelines = await Pipeline.find({
+    "case.id": req.params.id,
+    "case.generation": req.params.generation,
+    _id: { $in: ids },
+  })*/
+
+  //const generation = await Generation.findById(req.params.id)
+
+  res.status(200).json(pipelines)
+})
+
 module.exports = {
   getCases,
   createCase,
   getCase,
   getGenerations,
+  getGenerationCases,
 }

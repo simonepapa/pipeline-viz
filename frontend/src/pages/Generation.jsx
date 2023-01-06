@@ -34,18 +34,18 @@ function Generation() {
 
   return (
     <>
-      <Sidebar
-        generations={singleCase && singleCase.generations}
-        isLoading={isLoading}
-      />
+      <Sidebar />
       <main className="flex flex-wrap">
         <div className="w-fit max-w-5xl h-fit bg-base-100 ml-44 p-4 mt-4">
           <h1 className="text-xl text-current opacity-100 font-bold uppercase mb-2">
             Generation
           </h1>
-          <p>Please note that the pipelines are not in order. The number is shown only to identify each pipeline</p>
+          <p>
+            Please note that the pipelines are not in order. The number is shown
+            only to identify each pipeline
+          </p>
           <div className="flex flex-wrap mt-4">
-            {(!isLoadingGeneration && Object.keys(generation).length !== 0) ? (
+            {!isLoadingGeneration && Object.keys(generation).length !== 0 ? (
               generation.pipelines.map((pipeline, index) => (
                 <NavLink key={pipeline} to={`${pipeline}`}>
                   <div className="px-8 py-4 mr-8 mb-4 bg-secondary rounded hover:bg-secondary-focus transition-colors">

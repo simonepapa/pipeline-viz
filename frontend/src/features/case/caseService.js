@@ -30,11 +30,19 @@ const getGenerations = async (caseId, ids) => {
   return response.data
 }
 
+// Get generation cases
+const getGenerationCases = async (caseId, ids) => {
+  const response = await axios.post(API_URL + caseId + "/cases", {ids: ids})
+
+  return response.data
+}
+
 const historyService = {
   getCases,
   createCase,
   getCase,
   getGenerations,
+  getGenerationCases,
 }
 
 export default historyService

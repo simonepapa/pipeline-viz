@@ -39,7 +39,10 @@ function SingleCase() {
   const onSubmit = async (e) => {
     e.preventDefault()
     dispatch(
-      createGeneration({ caseId: params.id, number: singleCase.generations.length })
+      createGeneration({
+        caseId: params.id,
+        number: singleCase.generations.length,
+      })
     ).then(async (event) => {
       const results = []
       await Promise.all(
@@ -118,10 +121,7 @@ function SingleCase() {
         </div>
       </Modal>
 
-      <Sidebar
-        generations={singleCase && singleCase.generations}
-        isLoading={isLoading}
-      />
+      <Sidebar />
       <main>
         <div className="w-9/12 h-fit bg-base-100 mx-auto p-4 mt-2 ml-44 mr-4">
           <h1 className="text-2xl opacity-100">Case 1</h1>
