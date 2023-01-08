@@ -51,9 +51,6 @@ function Generation() {
   useEffect(() => {
     const getElements = async () => {
       await dispatch(getPipeline(params.pipeline))
-      for (const property in pipeline) {
-        console.log(`${property}: ${pipeline[property]}`)
-      }
       const cy = cyRef.current
 
       cy.elements()
@@ -85,7 +82,6 @@ function Generation() {
         var ul = document.createElement("ul")
 
         h3.innerHTML =
-          //ele._private.data.id + ": " + ele._private.data.operation_type
           ele._private.data.name
 
         for (const param in ele._private.data.params) {

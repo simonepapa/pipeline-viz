@@ -80,6 +80,36 @@ const putPipeline = asyncHandler(async (req, res) => {
   res.status(200).json("Successful")
 })
 
+// @desc    Get pipelines
+// @route   GET /api/pipelines/
+// @access  Public
+const getPipelines = asyncHandler(async (req, res) => {
+  const {generationId} = req.body
+
+  const pipeline = await Pipeline.findById(req.params.id)
+  const pipelineJSON = pipeline.toObject()
+  pipelineJSON.edges = []
+  pipelineJSON.nodes = []
+  pipelineJSON.graph.operator._nodes.map((node, index) => {
+    pipelineJSON.nodes[index] = { data: node.content, grabbable: false }
+    pipelineJSON.nodes[index].data.id = node.uid
+    //node.id = node.uid.toString()
+    //delete node.uid
+    node._nodes_from.map((link) => {
+      pipelineJSON.edges.push({
+        data: {
+          id: link.toString() + node.uid.toString(),
+          source: link.toString(),
+          target: node.uid.toString(),
+        },
+        grabbable: false,
+      })
+    })
+  })
+
+  res.status(200).json(pipelineJSON)
+})
+
 module.exports = {
   getPipeline,
   putPipeline,

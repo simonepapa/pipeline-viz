@@ -12,6 +12,7 @@
     "axios": "^1.2.2",
     "concurrently": "^7.6.0",
     "cytoscape": "^3.23.0",
+    "cytoscape-dagre": "^2.5.0",
     "cytoscape-klay": "^3.1.4",
     "cytoscape-popper": "^2.0.0",
     "daisyui": "^2.46.1",

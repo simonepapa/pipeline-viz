@@ -124,8 +124,8 @@ function SingleCase() {
       <Sidebar />
       <main>
         <div className="w-9/12 h-fit bg-base-100 mx-auto p-4 mt-2 ml-44 mr-4">
-          <h1 className="text-2xl opacity-100">Case 1</h1>
-          <p className="text-lg mt-1">Case description</p>
+          <h1 className="text-2xl opacity-100">{singleCase.name}</h1>
+          <p className="text-lg mt-1">{singleCase.description}</p>
           <NavLink to="history" className="btn btn-primary mr-4">
             History
           </NavLink>
