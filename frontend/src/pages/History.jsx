@@ -35,7 +35,6 @@ function History() {
   )
 
   function makePopper(ele) {
-    //console.log(ele)
     let ref = ele.popperRef()
     let dummyDomEle = document.createElement("div")
 
@@ -86,33 +85,15 @@ function History() {
             cy.elements()
               .nodes()
               .forEach(function (ele) {
-                if (!ele._private.data.id.startsWith("container")) {
+                if (
+                  !ele._private.data.id.startsWith("container") &&
+                  !ele._private.data.id.startsWith("generation")
+                ) {
                   makePopper(ele)
                   ele.bind("mouseover", (event) => event.target.tippy.show())
                   ele.bind("mouseout", (event) => event.target.tippy.hide())
                 }
               })
-
-            //cy.elements()
-            //  .nodes()
-            //  .forEach(function (ele) {
-            //    if (!ele._private.data.id.startsWith("container")) {
-            //      ele.bind("mouseover", (event) => event.target.tippy.show())
-            //    }
-            //  })
-
-            //cy.elements().bind("mouseover", (event) =>
-            //  event.target.tippy.show()
-            //)
-
-            //cy.elements().bind("mouseout", (event) => event.target.tippy.hide())
-            //cy.elements()
-            //  .nodes()
-            //  .forEach(function (ele) {
-            //    if (!ele._private.data.id.startsWith("container")) {
-            //      ele.bind("mouseout", (event) => event.target.tippy.hide())
-            //    }
-            //  })
           })
         })
       } else {
@@ -132,15 +113,27 @@ function History() {
   }, [])
 
   if (pipelines.length !== 0) {
-    for (let i = 0; i < 7; i++) {
-      elements.nodes.push({ data: { id: "container-" + i }, grabbable: false })
+    for (let i = 0; i < pipelines.length; i++) {
+      elements.nodes.push({
+        data: { id: "container-" + i, container: "true" },
+        grabbable: false,
+      })
+      elements.nodes.push({
+        data: {
+          id: "generation_" + i + "_label",
+          parent: "container-" + i,
+          label: "Generation " + i,
+          generation_label: "true",
+        },
+        grabbable: false,
+        position: { x: 0, y: i * 18 },
+      })
       pipelines[i].map((pipeline, index) => {
-        //if (pipeline.parent_operator !== null)
-        //  console.log(pipeline.parent_operator.parent_individuals)
         elements.nodes.push({
           data: {
             id: i + "-" + pipeline.uid,
             parent: "container-" + i,
+            label: "pip_" + i + "_" + index,
             info: {
               uid: pipeline.uid,
               native_generation: pipeline.native_generation,
@@ -155,7 +148,7 @@ function History() {
             },
           },
           grabbable: false,
-          position: { x: index * 10, y: i * 40 },
+          position: { x: index === 0 ? 15 : index * 15, y: i * 18 },
         })
         if (
           pipeline.parent_operator !== null &&
@@ -169,46 +162,22 @@ function History() {
             },
           })
         }
-        console.log(elements.edges)
       })
-      for (let i = 0; i < elements.edges.length; i++) {
-        const status = elements.nodes.find(
-          (element) => element.data.id === elements.edges[i].data.source
-        )
-        //console.log(status)
-        if (status === undefined) {
-          //console.log("Edge: ", elements.edges[i])
-          const index = elements.edges.indexOf(elements.edges[i])
-          console.log(index)
-          //console.log("Index: ", elements.edges.findIndex(x => x.data.id === elements.edges[i].data.id))
-          //elements.edges.splice(index, 1)
-        }
-      }
     }
     //for (let i = 0; i < elements.edges.length; i++) {
     //  const status = elements.nodes.find(
     //    (element) => element.data.id === elements.edges[i].data.source
     //  )
+    //  //console.log(status)
     //  if (status === undefined) {
+    //    //console.log("Edge: ", elements.edges[i])
     //    const index = elements.edges.indexOf(elements.edges[i])
+    //    console.log(index)
+    //    //console.log("Index: ", elements.edges.findIndex(x => x.data.id === elements.edges[i].data.id))
     //    elements.edges.splice(index, 1)
     //  }
     //}
-
-    //elements.nodes.push({ data: { id: "container" } })
-    //pipelines[1].map((pipeline) => {
-    //pipeline.nodes.map((node) => {
-    //  elements.nodes.push(node)
-    //})
-    //pipeline.edges.map((edge) => {
-    //  elements.edges.push(edge)
-    //})
-    //console.log(pipeline.uid)
-    //elements.nodes.push({data: {id: i+pipeline.uid, parent: "container-"+i}, grabbable: false, position: {x: index * 10, y: i * 40}})
-    //elements.edges.push({ data: { source: pipeline.native_generation+'-5ff9a656-2413-4306-b609-e716ad65f2a2', target: i+'-29e77a61-db7e-428f-995b-87e31b5f58cf' } })
   }
-
-  //console.log(pipelines)
 
   return (
     <>
@@ -227,13 +196,37 @@ function History() {
               elements={CytoscapeComponent.normalizeElements(elements)}
               stylesheet={[
                 {
-                  selector: "node",
+                  selector: "node[^container]",
                   css: {
-                    content: "",
+                    content: "data(label)",
                     "text-valign": "center",
                     "text-halign": "center",
-                    width: "5px",
+                    shape: "square",
+                    width: "10px",
                     height: "5px",
+                    "font-size": "2px",
+                    "background-color": "#9de1f4",
+                    "border-color": "#999",
+                    "border-width": "0.1px",
+                    "border-style": "solid",
+                    "overlay-opacity": 0,
+                  },
+                },
+                {
+                  selector: "node[generation_label]",
+                  css: {
+                    content: "data(label)",
+                    "text-valign": "center",
+                    "text-halign": "center",
+                    shape: "square",
+                    width: "12px",
+                    height: "5px",
+                    "font-size": "1.5px",
+                    "background-color": "#fff",
+                    "border-color": "#999",
+                    "border-width": "0.1px",
+                    "border-style": "solid",
+                    "overlay-opacity": 0,
                   },
                 },
                 {
@@ -241,6 +234,12 @@ function History() {
                   css: {
                     "text-valign": "top",
                     "text-halign": "center",
+                    "background-color": "#d3d7e8",
+                    "border-color": "#263238",
+                    "border-width": "0.1px",
+                    "border-style": "solid",
+                    "overlay-opacity": 0,
+                    padding: "2px",
                   },
                 },
                 {
@@ -250,6 +249,9 @@ function History() {
                     "target-arrow-shape": "triangle",
                     "arrow-scale": 0.1,
                     width: "0.1px",
+                    "overlay-opacity": 0,
+                    "line-color": "#007dff",
+                    "target-arrow-color": "#007dff",
                   },
                 },
               ]}
