@@ -104,7 +104,7 @@ body {
   z-index: 1;
   transform: translateX(-50%) translateY(-50%);
   width: 75vw;
-  height: 75vh;
+  height: 60vh;
 }
 
 h1 {

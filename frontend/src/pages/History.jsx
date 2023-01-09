@@ -8,7 +8,7 @@ import Modal from "react-modal"
 import tippy from "tippy.js"
 import "tippy.js/dist/tippy.css"
 import Sidebar from "../components/Sidebar"
-import Spinner from "../components/Spinner"
+import SpinnerFull from "../components/SpinnerFull"
 import { getCase } from "../features/case/caseSlice"
 import {
   getGenerations,
@@ -30,7 +30,7 @@ function History() {
 
   const layout = { name: "preset" }
 
-  const { singleCase, pipelines, isLoading, isError, message } = useSelector(
+  const { singleCase, pipelines, isLoading } = useSelector(
     (state) => state.case
   )
 
@@ -157,26 +157,38 @@ function History() {
           elements.edges.push({
             data: {
               source:
-                i - 1 + "-" + pipeline.parent_operator.parent_individuals[0],
+                pipeline.native_generation +
+                "-" +
+                pipeline.parent_operator.parent_individuals[0],
               target: i + "-" + pipeline.uid,
             },
           })
         }
       })
     }
-    //for (let i = 0; i < elements.edges.length; i++) {
-    //  const status = elements.nodes.find(
-    //    (element) => element.data.id === elements.edges[i].data.source
-    //  )
-    //  //console.log(status)
-    //  if (status === undefined) {
-    //    //console.log("Edge: ", elements.edges[i])
-    //    const index = elements.edges.indexOf(elements.edges[i])
-    //    console.log(index)
-    //    //console.log("Index: ", elements.edges.findIndex(x => x.data.id === elements.edges[i].data.id))
-    //    elements.edges.splice(index, 1)
-    //  }
-    //}
+    let length = elements.edges.length
+    // Loop through the edges to delete the ones with an invalid source
+    // We loop backwards to make sure that we delete all the edges (looping forwards causes the array to shrink, so we would miss some edges)
+    while (length--) {
+      // Check if the source node exists
+      const status = elements.nodes.find(
+        (element) => element.data.id === elements.edges[length].data.source
+      )
+      // If it doesn't exist
+      if (status === undefined) {
+        // First we tag the edgeless node
+        const warningElement = elements.nodes.find(
+          (element) => element.data.id === elements.edges[length].data.target
+        )
+        if (warningElement.data.info.hasOwnProperty("parent_individual")) {
+          warningElement.data.warning = "true"
+        }
+
+        // Then we remove the edge
+        const index = elements.edges.indexOf(elements.edges[length])
+        elements.edges.splice(index, 1)
+      }
+    }
   }
 
   return (
@@ -184,8 +196,22 @@ function History() {
       <Sidebar />
       <main>
         <div className="w-9/12 h-fit bg-base-100 mx-auto p-4 mt-2 ml-44 mr-4">
-          <h1 className="text-2xl opacity-100">History</h1>
-          <p className="text-lg mt-1">Case description</p>
+          <h1 className="text-2xl opacity-100">History of {singleCase.name}</h1>
+          <p className="text-lg mt-1">{singleCase.description}</p>
+          <p className="text-sm mt-1">
+            You can zoom in and out with the scroll wheel.
+          </p>
+          <p className="text-sm mt-1">
+            You can hover over each pipeline to see more additional information.
+          </p>
+          <p className="text-sm mt-1">
+            If you can't see nodes tooltip on hover, please refresh the page.
+          </p>
+          <p className="text-sm mt-1">
+            Pipelines with a yellow background are those that are missing the
+            parent pipeline. If you hover on them you can see their parent individual
+            UID.
+          </p>
         </div>
         <div className="flex flex-wrap mt-4">
           {!isLoading ? (
@@ -230,6 +256,12 @@ function History() {
                   },
                 },
                 {
+                  selector: "node[warning]",
+                  css: {
+                    "background-color": "yellow",
+                  },
+                },
+                {
                   selector: ":parent",
                   css: {
                     "text-valign": "top",
@@ -258,7 +290,7 @@ function History() {
               layout={layout}
             />
           ) : (
-            <Spinner />
+            <SpinnerFull />
           )}
         </div>
       </main>
