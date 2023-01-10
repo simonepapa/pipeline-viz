@@ -128,6 +128,7 @@ function Generation() {
                       "font-size": "8px",
                       width: "50px",
                       height: "50px",
+                      "overlay-opacity": 0,
                     },
                   },
                   {
@@ -135,6 +136,7 @@ function Generation() {
                     style: {
                       "curve-style": "bezier",
                       "target-arrow-shape": "triangle",
+                      "overlay-opacity": 0,
                     },
                   },
                 ]}

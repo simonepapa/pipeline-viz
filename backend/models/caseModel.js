@@ -5,6 +5,9 @@ const caseModel = mongoose.Schema(
     name: {
       type: String,
     },
+    description: {
+      type: String,
+    },
     generations: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Generation",

@@ -39,10 +39,9 @@ body {
   width: 100vw;
   height: 100vh;
   position: fixed;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   top: 0;
 }
-
 
 @keyframes rotate {
   0% {
@@ -98,13 +97,13 @@ body {
 .__________cytoscape_container {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 60%;
   bottom: 0;
   right: 0;
   z-index: 1;
   transform: translateX(-50%) translateY(-50%);
   width: 75vw;
-  height: 60vh;
+  height: 75vh;
 }
 
 h1 {

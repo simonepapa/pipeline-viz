@@ -1,8 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Navigation from "./components/Navigation"
-import Home from "./pages/Home"
 import LoadTest from "./pages/LoadTest"
 import Cases from "./pages/Cases"
 import SingleCase from "./pages/SingleCase"
@@ -17,12 +21,15 @@ function App() {
         <div className="bg-base-300">
           <Navigation />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate replace to="/cases" />} />
             <Route path="/cases" element={<Cases />} />
             <Route path="/cases/:id" element={<SingleCase />} />
             <Route path="/cases/:id/history" element={<History />} />
             <Route path="/cases/:id/:generation" element={<Generation />} />
-            <Route path="/cases/:id/:generation/:pipeline" element={<Pipeline />} />
+            <Route
+              path="/cases/:id/:generation/:pipeline"
+              element={<Pipeline />}
+            />
             <Route path="/load" element={<LoadTest />} />
           </Routes>
         </div>
