@@ -10,12 +10,7 @@ import "tippy.js/dist/tippy.css"
 import Sidebar from "../components/Sidebar"
 import SpinnerFull from "../components/SpinnerFull"
 import PipelineModal from "../components/PipelineModal"
-import { getCase } from "../features/case/caseSlice"
-import {
-  getGenerations,
-  getGenerationCases,
-  resetInfo,
-} from "../features/case/caseSlice"
+import { getHistory } from "../features/history/historySlice"
 
 Modal.setAppElement("#root")
 cytoscape.use(dagre)
@@ -23,6 +18,7 @@ cytoscape.use(dagre)
 function History() {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [uid, setUid] = useState(false)
+  const [setIsSettingUp] = useState(true)
 
   const params = useParams()
   const dispatch = useDispatch()
@@ -34,9 +30,8 @@ function History() {
 
   const layout = { name: "preset" }
 
-  const { singleCase, pipelines, isLoading } = useSelector(
-    (state) => state.case
-  )
+  const { singleCase, isLoading } = useSelector((state) => state.case)
+  const { history } = useSelector((state) => state.history)
 
   function makePopper(ele) {
     let ref = ele.popperRef()
@@ -69,90 +64,72 @@ function History() {
 
   useEffect(() => {
     const loadPage = async () => {
-      if (Object.keys(singleCase).length === 0) {
-        await dispatch(getCase(params.id)).then((e) => {
-          dispatch(
-            getGenerations({ caseId: params.id, ids: e.payload.generations })
-          ).then(async (event) => {
-            const pipelineIDS = []
-            for (const generation of event.payload) {
-              pipelineIDS.push(generation.pipelines)
-            }
-            await dispatch(
-              getGenerationCases({ caseId: params.id, ids: pipelineIDS })
-            )
-            const cy = cyRef.current
+      await dispatch(getHistory(params.history))
+      const cy = cyRef.current
 
-            cy.elements().unbind("mouseover")
-            cy.elements().unbind("mouseout")
+      cy.elements().unbind("mouseover")
+      cy.elements().unbind("mouseout")
 
-            cy.elements()
-              .nodes()
-              .forEach(function (ele) {
-                if (
-                  !ele._private.data.id.startsWith("container") &&
-                  !ele._private.data.id.startsWith("generation")
-                ) {
-                  makePopper(ele)
-                  ele.bind("mouseover", (event) => event.target.tippy.show())
-                  ele.bind("mouseout", (event) => event.target.tippy.hide())
-                  ele.bind("click", (event) => {
-                    cy.elements().nodes().removeClass("successors")
-                    cy.elements().nodes().removeClass("predecessors")
-                    let successors = event.target.successors()
-                    let i = 0
+      cy.elements()
+        .nodes()
+        .forEach(function (ele) {
+          if (
+            !ele._private.data.id.startsWith("container") &&
+            !ele._private.data.id.startsWith("generation")
+          ) {
+            makePopper(ele)
+            ele.bind("mouseover", (event) => event.target.tippy.show())
+            ele.bind("mouseout", (event) => event.target.tippy.hide())
+            ele.bind("click", (event) => {
+              cy.elements().nodes().removeClass("successors")
+              cy.elements().nodes().removeClass("predecessors")
+              let successors = event.target.successors()
+              let i = 0
 
-                    let highlightSuccessor = function () {
-                      if (i < successors.length) {
-                        if (!successors[i].hasClass("successors"))
-                          successors[i].addClass("successors")
-                        else successors[i].removeClass("successors")
-                        i++
-                        highlightSuccessor()
-                      }
-                    }
-
-                    let predecessors = event.target.predecessors()
-                    let j = 0
-
-                    let highlightPredecessor = function () {
-                      if (j < predecessors.length) {
-                        if (!predecessors[j].hasClass("predecessors"))
-                          predecessors[j].addClass("predecessors")
-                        else predecessors[j].removeClass("predecessors")
-                        j++
-                        highlightPredecessor()
-                      }
-                    }
-                    highlightSuccessor()
-                    highlightPredecessor()
-                  })
-                  ele.bind("dblclick", (event) => {
-                    setUid(event.target._private.data.info.fetch_id)
-                    setModalIsOpen(true)
-                  })
+              let highlightSuccessor = function () {
+                if (i < successors.length) {
+                  if (!successors[i].hasClass("successors"))
+                    successors[i].addClass("successors")
+                  else successors[i].removeClass("successors")
+                  i++
+                  highlightSuccessor()
                 }
-              })
-          })
-        })
-      } else {
-        dispatch(
-          getGenerations({ caseId: params.id, ids: singleCase.generations })
-        ).then((e) => {
-          const pipelineIDS = []
-          for (const generation of e.payload) {
-            pipelineIDS.push(generation.pipelines)
+              }
+
+              let predecessors = event.target.predecessors()
+              let j = 0
+
+              let highlightPredecessor = function () {
+                if (j < predecessors.length) {
+                  if (!predecessors[j].hasClass("predecessors"))
+                    predecessors[j].addClass("predecessors")
+                  else predecessors[j].removeClass("predecessors")
+                  j++
+                  highlightPredecessor()
+                }
+              }
+              highlightSuccessor()
+              highlightPredecessor()
+            })
+            ele.bind("dblclick", (event) => {
+              const uid = event.target._private.data.info.uid
+              setUid(uid)
+              setModalIsOpen(true)
+            })
           }
-          dispatch(getGenerationCases({ caseId: params.id, ids: pipelineIDS }))
         })
-      }
+      setIsSettingUp(false)
     }
 
     loadPage()
   }, [])
 
-  if (pipelines.length !== 0) {
-    for (let i = 0; i < pipelines.length; i++) {
+  if (
+    history !== undefined &&
+    history.individuals_pool !== undefined &&
+    history.individuals_pool.length !== 0
+  ) {
+    for (let i = 0; i < history.individuals.length; i++) {
       elements.nodes.push({
         data: { id: "container-" + i, container: "true" },
         grabbable: false,
@@ -168,47 +145,75 @@ function History() {
         // to remove parent left margin: position: { x: 0, y: i * 18 },,
         position: { x: i * 10, y: i * 18 },
       })
-      pipelines[i].map((pipeline, index) => {
-        elements.nodes.push({
-          data: {
-            id: i + "-" + pipeline.uid,
-            parent: "container-" + i,
-            label: "pip_" + i + "_" + index,
-            info: {
-              fetch_id: pipeline._id,
-              uid: pipeline.uid,
-              native_generation: pipeline.native_generation,
-              ...(pipeline.parent_operator !== null &&
-                pipeline.parent_operator.operators.length !== 0 && {
-                  parent_individual:
-                    pipeline.parent_operator.parent_individuals[0],
-                }),
-              ...(pipeline.parent_operator !== null && {
-                type: pipeline.parent_operator.type_,
-              }),
-            },
-          },
-          grabbable: false,
-          position: {
-            // to remove parent left margin: x: index === 0 ? 15 : index * 15,
-            x: index === 0 ? i * 10 + 15 : i * 10 + index * 15,
-            y: i * 18,
-          },
-        })
-        if (
-          pipeline.parent_operator !== null &&
-          pipeline.parent_operator.operators.length !== 0
-        ) {
-          elements.edges.push({
+      history.individuals[i].data.map((ele, index) => {
+        const pipeline = history.individuals_pool.find((fnd) => fnd.uid === ele)
+        if (pipeline) {
+          // Save parent individuals in an array
+          const parent_individual = []
+          if (
+            pipeline.parent_operator !== null &&
+            pipeline.parent_operator.operators.length !== 0
+          ) {
+            pipeline.parent_operator.parent_individuals.map((ele) => {
+              parent_individual.push(ele + "-" + pipeline.native_generation)
+            })
+          }
+          /*if (!elements.nodes.some(el => el.data.id === pipeline.uid)) {
+            
+          }*/
+          elements.nodes.push({
             data: {
-              source:
-                i - 1 + "-" + pipeline.parent_operator.parent_individuals[0],
-              target: i + "-" + pipeline.uid,
+              id: pipeline.uid + "-" + i,
+              ...(pipeline.native_generation !== null
+                ? {
+                    parent: "container-" + i,
+                  }
+                : {
+                    parent: "container-null",
+                  }),
+              label: "pip_" + i + "_" + index,
+              isPipeline: true,
+              info: {
+                //fetch_id: pipeline._id,
+                id: pipeline.uid + "-" + i,
+                uid: pipeline.uid,
+                native_generation: pipeline.native_generation,
+                ...(pipeline.parent_operator !== null &&
+                  pipeline.parent_operator.operators.length !== 0 && {
+                    parent_individual: parent_individual,
+                  }),
+                ...(pipeline.parent_operator !== null && {
+                  type: pipeline.parent_operator.type_,
+                }),
+              },
+            },
+            grabbable: false,
+            position: {
+              // to remove parent left margin: x: index === 0 ? 15 : index * 15,
+              x: index === 0 ? i * 10 + 15 : i * 10 + index * 15,
+              y: i * 18,
             },
           })
+
+          if (
+            pipeline.parent_operator !== null &&
+            pipeline.parent_operator.operators.length !== 0
+          ) {
+            pipeline.parent_operator.parent_individuals.map(
+              (parent_individual) => {
+                elements.edges.push({
+                  data: {
+                    source: parent_individual + "-" + (i - 1),
+                    target: pipeline.uid + "-" + i,
+                  },
+                })
+              }
+            )
+          }
         }
       })
     }
+  
     let length = elements.edges.length
     // Loop through the edges to delete the ones with an invalid source
     // We loop backwards to make sure that we delete all the edges (looping forwards causes the array to shrink, so we would miss some edges)
@@ -248,13 +253,16 @@ function History() {
             You can hover over each pipeline to see more additional information.
           </p>
           <p className="text-sm mt-1">
-            You can single click a pipeline to highlight its predecessors (green border) and successors (red border).
+            You can single click a pipeline to highlight its predecessors (green
+            border) and successors (red border).
           </p>
           <p className="text-sm mt-1">
-            You can double click a pipeline to view its nodes (to close the modal just click outside of it)
+            You can double click a pipeline to view its nodes (to close the
+            modal just click outside of it)
           </p>
           <p className="text-sm mt-1">
-            If you can't see nodes tooltip on hover or you can't click on pipelines, please refresh the page.
+            If you can't see nodes tooltip on hover or you can't click on
+            pipelines, please refresh the page.
           </p>
           <p className="text-sm mt-1">
             Pipelines with a yellow background are those that are missing the
@@ -367,6 +375,7 @@ function History() {
         open={modalIsOpen}
         setState={() => setModalIsOpen(!modalIsOpen)}
         pipelineUid={uid}
+        history={history}
       />
     </>
   )

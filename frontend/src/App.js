@@ -7,12 +7,9 @@ import {
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Navigation from "./components/Navigation"
-import LoadTest from "./pages/LoadTest"
 import Cases from "./pages/Cases"
 import SingleCase from "./pages/SingleCase"
 import History from "./pages/History"
-import Generation from "./pages/Generation"
-import Pipeline from "./pages/Pipeline"
 
 function App() {
   return (
@@ -24,13 +21,7 @@ function App() {
             <Route path="/" element={<Navigate replace to="/cases" />} />
             <Route path="/cases" element={<Cases />} />
             <Route path="/cases/:id" element={<SingleCase />} />
-            <Route path="/cases/:id/history" element={<History />} />
-            <Route path="/cases/:id/:generation" element={<Generation />} />
-            <Route
-              path="/cases/:id/:generation/:pipeline"
-              element={<Pipeline />}
-            />
-            <Route path="/load" element={<LoadTest />} />
+            <Route path="/cases/:id/:history" element={<History />} />
           </Routes>
         </div>
       </Router>

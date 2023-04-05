@@ -8,10 +8,9 @@ const caseModel = mongoose.Schema(
     description: {
       type: String,
     },
-    generations: {
+    history: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Generation",
-      type: Array,
+      ref: "History",
     },
   },
   {

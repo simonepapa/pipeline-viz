@@ -21,8 +21,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/case", require("./routes/caseRoutes"))
-app.use("/api/pipeline", require("./routes/pipelineRoutes"))
-app.use("/api/generation", require("./routes/generationRoutes"))
+app.use("/api/history", require("./routes/historyRoutes"))
 
 app.use(errorHandler)
 

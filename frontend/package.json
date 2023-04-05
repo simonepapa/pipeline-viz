@@ -15,6 +15,8 @@
     "cytoscape-dagre": "^2.5.0",
     "cytoscape-klay": "^3.1.4",
     "cytoscape-popper": "^2.0.0",
+    "d3": "^7.8.2",
+    "dagre-d3": "^0.6.4",
     "daisyui": "^2.46.1",
     "react": "^18.2.0",
     "react-cytoscapejs": "^2.0.0",
